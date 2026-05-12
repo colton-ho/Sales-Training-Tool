@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>銷售技巧提升平台</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --bg: #f0f4ff;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+      color: #fff;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 2px 12px rgba(37,99,235,.25);
+    }
+    header .logo { font-size: 2rem; }
+    header h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: .02em; }
+    header p { font-size: .85rem; opacity: .85; margin-top: 2px; }
+
+    main {
+      max-width: 860px;
+      margin: 36px auto;
+      padding: 0 20px;
+    }
+
+    /* Step indicator */
+    .steps {
+      display: flex;
+      gap: 0;
+      margin-bottom: 32px;
+      background: var(--card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    .step-btn {
+      flex: 1;
+      padding: 14px 12px;
+      border: none;
+      background: none;
+      font-size: .9rem;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-bottom: 3px solid transparent;
+      transition: all .2s;
+    }
+    .step-btn .num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--border);
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+    }
+    .step-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .step-btn.active .num {
+      background: var(--primary);
+      color: #fff;
+    }
+    .step-btn.done .num {
+      background: var(--success);
+      color: #fff;
+    }
+    .step-btn.done { color: var(--success); }
+
+    /* Cards */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: 0 1px 8px rgba(0,0,0,.08);
+      margin-bottom: 24px;
+    }
+    .card h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .card .subtitle {
+      color: var(--muted);
+      font-size: .88rem;
+      margin-bottom: 24px;
+    }
+
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      background: #fafbff;
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--primary);
+      background: #eff6ff;
+    }
+    .upload-zone .icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .upload-zone p { color: var(--muted); font-size: .9rem; }
+    .upload-zone strong { color: var(--primary); }
+    #fileInput { display: none; }
+
+    /* Slide preview */
+    .slide-list {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .slide-item {
+      background: #f8faff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: .88rem;
+    }
+    .slide-item .slide-num {
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .slide-item .slide-content {
+      color: var(--muted);
+      white-space: pre-wrap;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 24px;
+      border-radius: 8px;
+      border: none;
+      font-size: .93rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .18s;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+    .btn-danger:hover:not(:disabled) { background: #b91c1c; }
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+    .btn-success:hover:not(:disabled) { background: #15803d; }
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+    .btn-outline:hover:not(:disabled) { background: #eff6ff; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+    /* Record section */
+    .recorder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 12px 0;
+    }
+    .record-btn {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      border: 4px solid var(--danger);
+      background: #fff;
+      font-size: 2rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+      box-shadow: 0 4px 16px rgba(220,38,38,.2);
+    }
+    .record-btn.recording {
+      background: var(--danger);
+      animation: pulse 1.2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(220,38,38,.4); }
+      50% { box-shadow: 0 0 0 16px rgba(220,38,38,0); }
+    }
+    .timer {
+      font-size: 1.8rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+    }
+    .recording-status {
+      font-size: .88rem;
+      color: var(--muted);
+    }
+    .recording-status .dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      background: var(--danger);
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* Audio playback */
+    audio { width: 100%; border-radius: 8px; margin-top: 8px; }
+
+    /* Transcript */
+    .transcript-box {
+      background: #f8faff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-size: .9rem;
+      line-height: 1.7;
+      color: var(--text);
+      min-height: 80px;
+      margin-top: 16px;
+    }
+
+    /* Score display */
+    .score-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0 28px;
+    }
+    .score-ring {
+      position: relative;
+      width: 140px; height: 140px;
+      margin-bottom: 12px;
+    }
+    .score-ring svg { transform: rotate(-90deg); }
+    .score-ring .score-num {
+      position: absolute;
+      inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .score-label {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    /* Dimension bars */
+    .dimensions { display: flex; flex-direction: column; gap: 14px; }
+    .dim-row { display: flex; flex-direction: column; gap: 5px; }
+    .dim-header { display: flex; justify-content: space-between; align-items: baseline; }
+    .dim-name { font-size: .9rem; font-weight: 600; }
+    .dim-score { font-size: .9rem; font-weight: 700; color: var(--primary); }
+    .bar-bg {
+      height: 8px; border-radius: 99px;
+      background: var(--border);
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, var(--primary), #7c3aed);
+      transition: width 1s ease;
+    }
+    .dim-feedback { font-size: .82rem; color: var(--muted); margin-top: 2px; }
+
+    /* Lists */
+    .list-section { margin-top: 24px; }
+    .list-section h3 {
+      font-size: .97rem; font-weight: 700; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .bullet-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .bullet-list li {
+      display: flex; gap: 10px;
+      font-size: .88rem; line-height: 1.55;
+    }
+    .bullet-list li .icon { flex-shrink: 0; font-size: 1rem; }
+
+    /* Overall comment */
+    .overall-box {
+      background: linear-gradient(135deg, #eff6ff, #f5f3ff);
+      border: 1px solid #c7d2fe;
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: .9rem;
+      line-height: 1.7;
+      color: var(--text);
+      margin-top: 24px;
+    }
+
+    /* Loading overlay */
+    .loading-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(3px);
+      z-index: 999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: #fff;
+    }
+    .loading-overlay.show { display: flex; }
+    .spinner {
+      width: 52px; height: 52px;
+      border: 5px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .85s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 1.05rem; font-weight: 600; }
+    .loading-sub { font-size: .85rem; opacity: .8; }
+
+    /* Alert */
+    .alert {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: .88rem;
+      margin-bottom: 16px;
+    }
+    .alert.show { display: flex; align-items: flex-start; gap: 10px; }
+    .alert-error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+
+    /* Sections */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      header { padding: 16px 20px; }
+      .card { padding: 20px 16px; }
+      main { margin: 20px auto; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🎯</div>
+  <div>
+    <h1>銷售技巧提升平台</h1>
+    <p>上傳投影片 · 練習簡報 · 獲得 AI 評分與建議</p>
+  </div>
+</header>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">處理中…</div>
+  <div class="loading-sub" id="loadingSub"></div>
+</div>
+
+<main>
+
+  <!-- Step indicator -->
+  <div class="steps">
+    <button class="step-btn active" id="stepBtn1" onclick="goToStep(1)">
+      <span class="num" id="stepNum1">1</span> 上傳投影片
+    </button>
+    <button class="step-btn" id="stepBtn2" onclick="goToStep(2)">
+      <span class="num" id="stepNum2">2</span> 練習錄音
+    </button>
+    <button class="step-btn" id="stepBtn3" onclick="goToStep(3)">
+      <span class="num" id="stepNum3">3</span> 查看評分
+    </button>
+  </div>
+
+  <!-- Step 1: Upload PPT -->
+  <div class="section active" id="step1">
+    <div class="card">
+      <h2>📄 上傳簡報投影片</h2>
+      <p class="subtitle">支援 .pptx / .ppt 格式。上傳後系統將自動讀取每張投影片的文字內容。</p>
+
+      <div id="alertBox" class="alert alert-error"></div>
+
+      <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <div class="icon">📁</div>
+        <p><strong>點擊選擇檔案</strong>或拖曳投影片到此處</p>
+        <p style="font-size:.8rem;margin-top:6px;color:#94a3b8;">支援 .pptx / .ppt</p>
+      </div>
+      <input type="file" id="fileInput" accept=".ppt,.pptx" />
+
+      <div id="slidePreview" class="slide-list" style="display:none"></div>
+
+      <div style="margin-top:20px" id="uploadActions" style="display:none">
+        <div class="btn-row">
+          <button class="btn btn-outline" onclick="resetUpload()">重新選擇</button>
+          <button class="btn btn-primary" id="nextToRecord" onclick="goToStep(2)" disabled>
+            下一步：開始練習 →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Record -->
+  <div class="section" id="step2">
+    <div class="card">
+      <h2>🎙️ 練習簡報錄音</h2>
+      <p class="subtitle">依照您的投影片內容進行銷售簡報練習，系統將錄製您的聲音並轉為文字。</p>
+
+      <div id="alertBox2" class="alert alert-error"></div>
+
+      <!-- Slide reference -->
+      <div id="slideRef" style="margin-bottom:24px"></div>
+
+      <div class="recorder">
+        <button class="record-btn" id="recordBtn" onclick="toggleRecord()">🎙️</button>
+        <div class="timer" id="timer">00:00</div>
+        <div class="recording-status" id="recordingStatus" style="display:none">
+          <span class="dot"></span>錄音中…
+        </div>
+      </div>
+
+      <div id="audioSection" style="display:none;margin-top:16px">
+        <p style="font-size:.88rem;color:var(--muted);margin-bottom:6px">錄音預覽：</p>
+        <audio id="audioPlayer" controls></audio>
+      </div>
+
+      <div class="btn-row" style="margin-top:24px">
+        <button class="btn btn-outline" onclick="goToStep(1)">← 返回</button>
+        <button class="btn btn-primary" id="analyzeBtn" onclick="submitAnalysis()" disabled>
+          🚀 提交分析
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Results -->
+  <div class="section" id="step3">
+    <div class="card">
+      <h2>📊 AI 評分報告</h2>
+      <p class="subtitle">以下是根據您的投影片內容與簡報表現所生成的評估結果。</p>
+
+      <!-- Score ring -->
+      <div class="score-hero">
+        <div class="score-ring">
+          <svg width="140" height="140" viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r="58" fill="none" stroke="#e2e8f0" stroke-width="12"/>
+            <circle cx="70" cy="70" r="58" fill="none" stroke="url(#grad)" stroke-width="12"
+                    stroke-linecap="round"
+                    id="scoreCircle"
+                    stroke-dasharray="364.4"
+                    stroke-dashoffset="364.4"/>
+            <defs>
+              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#2563eb"/>
+                <stop offset="100%" stop-color="#7c3aed"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="score-num" id="scoreNum">--</div>
+        </div>
+        <div class="score-label">總分 / 100</div>
+      </div>
+
+      <!-- Dimensions -->
+      <div class="dimensions" id="dimensions"></div>
+
+      <!-- Overall comment -->
+      <div class="overall-box" id="overallComment"></div>
+
+      <!-- Strengths & Improvements -->
+      <div class="list-section">
+        <h3>✅ 表現亮點</h3>
+        <ul class="bullet-list" id="strengthsList"></ul>
+      </div>
+      <div class="list-section">
+        <h3>💡 改善建議</h3>
+        <ul class="bullet-list" id="improvementsList"></ul>
+      </div>
+
+      <!-- Transcript -->
+      <div class="list-section">
+        <h3>📝 語音逐字稿</h3>
+        <div class="transcript-box" id="transcriptBox"></div>
+      </div>
+
+      <div class="btn-row" style="margin-top:28px">
+        <button class="btn btn-outline" onclick="restartPractice()">🔄 再練習一次</button>
+        <button class="btn btn-primary" onclick="fullReset()">📄 上傳新投影片</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ---- State ----
+  let sessionId = null;
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let timerInterval = null;
+  let seconds = 0;
+  let audioBlob = null;
+
+  // ---- HTML escape helper (prevents XSS) ----
+  function esc(str) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(String(str)));
+    return d.innerHTML;
+  }
+
+  const DIM_LABELS = {
+    content_coverage: '內容完整性',
+    language_quality: '語言表達',
+    persuasiveness: '說服力',
+    structure: '結構條理',
+    confidence: '自信度',
+  };
+
+  // ---- Drag & drop ----
+  const dropZone = document.getElementById('dropZone');
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  });
+  document.getElementById('fileInput').addEventListener('change', e => {
+    if (e.target.files[0]) handleFile(e.target.files[0]);
+  });
+
+  // ---- File upload ----
+  async function handleFile(file) {
+    if (!file.name.match(/\.(ppt|pptx)$/i)) {
+      showAlert('alertBox', '請選擇 .ppt 或 .pptx 格式的檔案');
+      return;
+    }
+    showLoading('上傳投影片中…', '正在讀取投影片內容');
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/upload-ppt', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || '上傳失敗');
+      sessionId = data.session_id;
+      renderSlidePreview(data.slides);
+      hideAlert('alertBox');
+      document.getElementById('nextToRecord').disabled = false;
+      document.getElementById('uploadActions').style.display = 'block';
+    } catch (err) {
+      showAlert('alertBox', err.message);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  function renderSlidePreview(slides) {
+    const container = document.getElementById('slidePreview');
+    container.innerHTML = slides.map(s => `
+      <div class="slide-item">
+        <div class="slide-num">第 ${esc(s.slide)} 張投影片</div>
+        <div class="slide-content">${
+          s.content.length ? esc(s.content.join('\n')) : '（此投影片無文字內容）'
+        }</div>
+      </div>
+    `).join('');
+    container.style.display = 'flex';
+
+    // Also render slide reference in step 2
+    const ref = document.getElementById('slideRef');
+    ref.innerHTML = `
+      <details>
+        <summary style="cursor:pointer;font-size:.9rem;font-weight:600;color:var(--primary);padding:8px 0">
+          📋 查看投影片內容參考（共 ${esc(slides.length)} 張）
+        </summary>
+        <div style="margin-top:10px;max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:8px">
+          ${slides.map(s => `
+            <div class="slide-item">
+              <div class="slide-num">第 ${esc(s.slide)} 張</div>
+              <div class="slide-content">${esc(s.content.join('\n')) || '（無文字）'}</div>
+            </div>
+          `).join('')}
+        </div>
+      </details>
+    `;
+  }
+
+  function resetUpload() {
+    document.getElementById('fileInput').value = '';
+    document.getElementById('slidePreview').style.display = 'none';
+    document.getElementById('nextToRecord').disabled = true;
+    sessionId = null;
+    hideAlert('alertBox');
+  }
+
+  // ---- Step navigation ----
+  function goToStep(n) {
+    if (n === 2 && !sessionId) { showAlert('alertBox', '請先上傳投影片'); return; }
+    if (n === 3 && !document.getElementById('step3').dataset.ready) return;
+    [1,2,3].forEach(i => {
+      document.getElementById(`step${i}`).classList.toggle('active', i === n);
+      const btn = document.getElementById(`stepBtn${i}`);
+      btn.classList.remove('active','done');
+      if (i === n) btn.classList.add('active');
+      else if (i < n) btn.classList.add('done');
+    });
+    // Mark done steps with checkmark
+    [1,2,3].forEach(i => {
+      const num = document.getElementById(`stepNum${i}`);
+      if (i < n) num.textContent = '✓';
+      else num.textContent = i;
+    });
+  }
+
+  // ---- Recording ----
+  async function toggleRecord() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  }
+
+  async function startRecording() {
+    hideAlert('alertBox2');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+      mediaRecorder.onstop = () => {
+        audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const url = URL.createObjectURL(audioBlob);
+        document.getElementById('audioPlayer').src = url;
+        document.getElementById('audioSection').style.display = 'block';
+        document.getElementById('analyzeBtn').disabled = false;
+        stream.getTracks().forEach(t => t.stop());
+      };
+      mediaRecorder.start();
+      document.getElementById('recordBtn').classList.add('recording');
+      document.getElementById('recordBtn').textContent = '⏹️';
+      document.getElementById('recordingStatus').style.display = 'block';
+      seconds = 0;
+      timerInterval = setInterval(() => {
+        seconds++;
+        const m = String(Math.floor(seconds/60)).padStart(2,'0');
+        const s = String(seconds%60).padStart(2,'0');
+        document.getElementById('timer').textContent = `${m}:${s}`;
+      }, 1000);
+    } catch (err) {
+      showAlert('alertBox2', '無法存取麥克風，請確認瀏覽器已允許麥克風權限');
+    }
+  }
+
+  function stopRecording() {
+    if (mediaRecorder) mediaRecorder.stop();
+    clearInterval(timerInterval);
+    document.getElementById('recordBtn').classList.remove('recording');
+    document.getElementById('recordBtn').textContent = '🎙️';
+    document.getElementById('recordingStatus').style.display = 'none';
+  }
+
+  // ---- Submit analysis ----
+  async function submitAnalysis() {
+    if (!audioBlob || !sessionId) return;
+    showLoading('AI 分析中…', '正在轉錄語音並評分，請稍候（約 20–40 秒）');
+    document.getElementById('analyzeBtn').disabled = true;
+
+    const formData = new FormData();
+    formData.append('session_id', sessionId);
+    formData.append('audio', audioBlob, 'recording.webm');
+
+    try {
+      const res = await fetch('/api/analyze', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || '分析失敗');
+      renderResults(data);
+      document.getElementById('step3').dataset.ready = '1';
+      goToStep(3);
+    } catch (err) {
+      showAlert('alertBox2', err.message);
+      document.getElementById('analyzeBtn').disabled = false;
+    } finally {
+      hideLoading();
+    }
+  }
+
+  // ---- Render results ----
+  function renderResults(data) {
+    const { transcript, analysis } = data;
+    const { total_score, dimensions, strengths, improvements, overall_comment } = analysis;
+
+    // Score ring animation
+    document.getElementById('scoreNum').textContent = total_score;
+    const circumference = 364.4;
+    const offset = circumference - (total_score / 100) * circumference;
+    setTimeout(() => {
+      document.getElementById('scoreCircle').style.transition = 'stroke-dashoffset 1.2s ease';
+      document.getElementById('scoreCircle').style.strokeDashoffset = offset;
+    }, 100);
+
+    // Dimension bars
+    const dimContainer = document.getElementById('dimensions');
+    dimContainer.innerHTML = Object.entries(dimensions).map(([key, val]) => `
+      <div class="dim-row">
+        <div class="dim-header">
+          <span class="dim-name">${esc(DIM_LABELS[key] || key)}</span>
+          <span class="dim-score">${esc(val.score)} / 20</span>
+        </div>
+        <div class="bar-bg">
+          <div class="bar-fill" style="width:${(val.score/20)*100}%"></div>
+        </div>
+        <div class="dim-feedback">${esc(val.feedback)}</div>
+      </div>
+    `).join('');
+
+    // Overall comment
+    document.getElementById('overallComment').textContent = '💬 ' + overall_comment;
+
+    // Strengths
+    document.getElementById('strengthsList').innerHTML =
+      strengths.map(s => `<li><span class="icon">✅</span><span>${esc(s)}</span></li>`).join('');
+
+    // Improvements
+    document.getElementById('improvementsList').innerHTML =
+      improvements.map(s => `<li><span class="icon">💡</span><span>${esc(s)}</span></li>`).join('');
+
+    // Transcript
+    document.getElementById('transcriptBox').textContent = transcript;
+  }
+
+  // ---- Restart / reset ----
+  function restartPractice() {
+    audioBlob = null;
+    audioChunks = [];
+    document.getElementById('audioSection').style.display = 'none';
+    document.getElementById('analyzeBtn').disabled = true;
+    document.getElementById('timer').textContent = '00:00';
+    document.getElementById('step3').removeAttribute('data-ready');
+    goToStep(2);
+  }
+
+  function fullReset() {
+    sessionId = null;
+    audioBlob = null;
+    document.getElementById('slidePreview').style.display = 'none';
+    document.getElementById('nextToRecord').disabled = true;
+    document.getElementById('uploadActions').style.display = 'none';
+    document.getElementById('fileInput').value = '';
+    document.getElementById('audioSection').style.display = 'none';
+    document.getElementById('analyzeBtn').disabled = true;
+    document.getElementById('timer').textContent = '00:00';
+    document.getElementById('step3').removeAttribute('data-ready');
+    goToStep(1);
+  }
+
+  // ---- UI helpers ----
+  function showLoading(text, sub) {
+    document.getElementById('loadingText').textContent = text;
+    document.getElementById('loadingSub').textContent = sub || '';
+    document.getElementById('loadingOverlay').classList.add('show');
+  }
+  function hideLoading() {
+    document.getElementById('loadingOverlay').classList.remove('show');
+  }
+  function showAlert(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = '⚠️ ' + msg;
+    el.classList.add('show');
+  }
+  function hideAlert(id) {
+    const el = document.getElementById(id);
+    el.classList.remove('show');
+  }
+</script>
+</body>
+</html>
